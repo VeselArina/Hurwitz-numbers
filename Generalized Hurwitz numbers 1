@@ -1,0 +1,127 @@
+#функция перемножает транспозиции
+def sigm(n, m, tr):
+    while m > 0:
+        m = m - 1
+        per = tr[m]
+        first_ind = per[0] - 1
+        first_elem = n[first_ind]
+        second_ind = per[1] - 1
+        second_elem = n[second_ind]
+        n[first_ind] = second_elem
+        n[second_ind] = first_elem
+    return n
+
+def multi_sigma(sigma_1, sigma_2):
+    result = []
+    for i in range(len(sigma_1)):
+        first = sigma_2[i]
+        second = sigma_1[first - 1]
+        result.append(second)
+    return result
+    
+
+#функция ищет k от перестановки
+def k(d):
+    n = sorted(d)
+    rez = []
+    povtor = []
+    for i in range(len(d)):
+        vrem = []
+        flag = 1
+        if d[i] not in povtor:
+            povtor.append(d[i])
+            vrem.append(d[i])
+            if d[i] != n[i]:
+                vrem.append(n[i])
+                povtor.append(n[i])
+            g = d[i]
+            p = n[i]
+            while flag == 1:
+                s = d.index(p)
+                g = d[s]
+                p = n[s]
+
+                if p not in vrem:
+                    vrem.append(p)
+                    povtor.append(p)
+                else:
+                    rez.append(vrem)
+                    flag = 0
+    return len(d) - len(rez)
+
+def is_sigma_mul(d, mu):
+    n = sorted(d)
+    rez = []
+    povtor = []
+    for i in range(len(d)):
+        vrem = []
+        flag = 1
+        if d[i] not in povtor:
+            povtor.append(d[i])
+            vrem.append(d[i])
+            if d[i] != n[i]:
+                vrem.append(n[i])
+                povtor.append(n[i])
+            g = d[i]
+            p = n[i]
+            while flag == 1:
+                s = d.index(p)
+                g = d[s]
+                p = n[s]
+
+                if p not in vrem:
+                    vrem.append(p)
+                    povtor.append(p)
+                else:
+                    rez.append(vrem)
+                    flag = 0
+    cikl_type =[]
+    for i in range(len(rez)):
+        cikl_type.append(len(rez[i]))
+    cikl_type.sort(reverse=True)
+    if cikl_type == mu:
+        return 1
+    else:
+        return 0
+
+def factorial(n):
+    factorial = 1
+    for i in range(n):
+        factorial = factorial * (i+1)
+    return factorial
+
+def obob_gurvic_opr(m, mu, k_mass):
+    n = sum(mu)
+    massiv_do_n = []
+    for i in range(n):
+        massiv_do_n.append(i+1)
+    perestanovki = list(itertools.permutations(massiv_do_n))
+    k_perestanovki = {}
+    for perestanovka in perestanovki:
+        perestanovka = list(perestanovka)
+        perestanovka_k = k(perestanovka)
+        if perestanovka_k in k_perestanovki.keys():
+            k_perestanovki[perestanovka_k].append(perestanovka)
+        else:
+            k_perestanovki[perestanovka_k] = []
+            k_perestanovki[perestanovka_k].append(perestanovka)
+
+    vse_nabori = []
+    cod = ""
+    for i in range(m):
+        cod += "for i" + str(i+1) + " in k_perestanovki[" + str(k_mass[i]) + "]:\n" + (i+1)*4*" "
+    mass_str = "["
+    for i in range(m):
+        mass_str += "i" + str(i+1) + ", "
+    mass_str = mass_str[:-2]
+    mass_str+= "]"
+    cod += "vse_nabori.append(" + mass_str + ")"
+    exec(cod)
+    otvet = 0
+    for nabor in vse_nabori:
+        multi_res = nabor[-1]
+        for sigma in nabor[:-1:-1]:
+            multi_res = multi_sigma(sigma, multi_res)
+        otvet += is_sigma_mul(multi_res, mu)
+
+    return otvet/factorial(n)
